@@ -1,15 +1,15 @@
-import { auth } from "@/lib/auth";
+import { requireMfa, requireSameOrigin } from "@/lib/server/access";
 import { createOrganizationForUser, listOrganizationsForUser } from "@/lib/server/tenant-data";
-import { badRequest, readObject, serverError, textField, unauthorized } from "@/lib/server/requests";
+import { badRequest, readObject, serverError, textField } from "@/lib/server/requests";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return unauthorized();
+  const access = await requireMfa(request);
+  if (!access.ok) return access.response;
   try {
-    const organizations = await listOrganizationsForUser(session.user.id);
+    const organizations = await listOrganizationsForUser(access.session.userId);
     return Response.json({ organizations }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return serverError();
@@ -17,13 +17,15 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: request.headers });
-  if (!session) return unauthorized();
+  const originError = requireSameOrigin(request);
+  if (originError) return originError;
+  const access = await requireMfa(request);
+  if (!access.ok) return access.response;
   const body = await readObject(request);
   const name = textField(body?.name, 120);
   if (!name) return badRequest();
   try {
-    const organization = await createOrganizationForUser(session.user.id, name);
+    const organization = await createOrganizationForUser(access.session.userId, name);
     return Response.json({ organization }, { status: 201 });
   } catch {
     return serverError();

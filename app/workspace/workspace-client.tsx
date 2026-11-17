@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import InvitationsClient from "./invitations-client";
 
 type Role = "owner" | "editor" | "viewer";
 type Org = { id: string; name: string; role: Role };
@@ -22,6 +23,7 @@ async function api<T>(path: string, method = "GET", body?: object): Promise<T> {
   });
   if (!result.ok) {
     if (result.status === 401) throw new Error("Tu sesión ha caducado. Vuelve a iniciar sesión.");
+    if (result.status === 403) throw new Error("Verifica tu cuenta y activa la autenticación de dos factores.");
     if (result.status === 404) throw new Error("Recurso no encontrado o sin permisos.");
     if (result.status === 400) throw new Error("Comprueba los datos introducidos.");
     throw new Error("No ha sido posible completar la operación.");
@@ -180,6 +182,7 @@ export default function WorkspaceClient({ userName }: { userName: string }) {
         </>}
       </div>
     </section>
+    <InvitationsClient organizationId={selectedId} isOwner={selected?.role === "owner"} onAccepted={loadOrganizations} />
     <section className="compliance-card"><div className="compliance-symbol">!</div><div><h2>Operaciones financieras desactivadas</h2><p>Este panel registra datos operativos, no representa derechos reales ni realiza tokenizaciones. Antes de activar emisiones, pagos o inversores deberá superarse la evaluación legal y de seguridad.</p></div><span className="compliance-flag">BLOQUEADO</span></section>
   </div>;
 }

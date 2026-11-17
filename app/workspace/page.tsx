@@ -15,6 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function WorkspacePage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
+  if (!session.user.emailVerified || session.user.twoFactorEnabled !== true) redirect("/security");
   return <main className="workspace-page">
     <header className="site-header wrap">
       <Link href="/" className="brand"><span className="brand-symbol">T</span> tokentiva<span className="brand-dot">.</span></Link>
