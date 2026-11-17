@@ -64,8 +64,8 @@ jobs:
             pg_dump -h 127.0.0.1 -U postgres -d tokentiva_test -Fc -f /tmp/tokentiva-ci.dump
             createdb -h 127.0.0.1 -U postgres tokentiva_restore_test
             pg_restore -h 127.0.0.1 -U postgres -d tokentiva_restore_test --no-owner --no-acl /tmp/tokentiva-ci.dump
-            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''assets'\'';" | grep -qx t
-            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''asset_documents'\'';" | grep -qx t
+            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''assets'\'';" | grep -qx true
+            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''asset_documents'\'';" | grep -qx true
             psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT count(*) FROM organization_invitations WHERE role='\''owner'\'';" | grep -qx 1
           '
       - name: Verify Docker Compose configuration
