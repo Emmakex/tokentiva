@@ -62,6 +62,6 @@ test("rechaza email incorrecto, correo no verificado, expiraci√≥n y reutilizaci√
   assert.equal(otherOrg.rowCount,0);
   const expired=await createInvitation(owner,orgA,"expired@example.org","viewer");
   assert.ok(expired);
-  await pool.query("UPDATE organization_invitations SET expires_at=now()-interval '1 minute' WHERE id=$1",[expired.id]);
+  await pool.query("UPDATE organization_invitations SET created_at=now()-interval '2 days', expires_at=now()-interval '1 day' WHERE id=$1",[expired.id]);
   assert.equal(await acceptInvitation("new", "expired@example.org", true, expired.code),"rejected");
 });
