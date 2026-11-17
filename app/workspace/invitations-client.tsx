@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 
 type Pending = {id:string;email:string;role:"editor"|"viewer";expires_at:string};
 type InvitationResponse = {invitation:{code:string;id:string;expiresAt:string}};
@@ -81,7 +82,7 @@ export default function InvitationsClient({
   return <section className="invite-box" aria-labelledby="invitations-title">
     <p className="eyebrow">COLABORACIÓN SEGURA</p>
     <h2 id="invitations-title">Acceso a organizaciones</h2>
-    <p className="invite-help">Las invitaciones requieren una cuenta existente con correo verificado y autenticación de dos factores. Caducan a los 7 días y solo pueden utilizarse una vez.</p>
+    <p className="invite-help">Los nuevos colaboradores pueden crear su cuenta desde una invitación. Para unirse deben verificar el correo y activar el segundo factor. El código caduca a los siete días y solo se acepta una vez.</p>
     {error&&<p className="auth-error" role="alert">{error}</p>}
     {notice&&<p className="workspace-message" role="status">{notice}</p>}
     <div className="invite-grid">
@@ -101,7 +102,7 @@ export default function InvitationsClient({
           <strong>Código de un solo uso</strong>
           <code>{issued}</code>
           <button type="button" onClick={()=>void navigator.clipboard.writeText(issued)}>Copiar código</button>
-          <p className="invite-help">Este código no se volverá a mostrar. No lo publiques ni lo envíes por canales abiertos.</p>
+          <p className="invite-help">Este código no se volverá a mostrar. Comparte también la página /invite por un canal privado. No publiques el código.</p>
         </div>}
         {pending.length>0&&<><h3>Invitaciones pendientes</h3>
           <ul className="invite-list">{pending.map(p=><li key={p.id}>{p.email} · {p.role} · hasta {new Date(p.expires_at).toLocaleDateString("es-ES")}
@@ -115,7 +116,7 @@ export default function InvitationsClient({
           <input id="invite-code" value={code} onChange={e=>setCode(e.target.value)} autoComplete="off" required maxLength={43} placeholder="Pega el código de invitación"/>
           <button className="button" type="submit" disabled={busy}>Unirme a la organización</button>
         </form>
-        <p className="invite-help">La plataforma comprobará que el correo de tu cuenta coincide con el destinatario. La invitación no autoriza compras, inversiones ni transferencias.</p>
+        <p className="invite-help">La plataforma comprobará que el correo de tu cuenta coincide con el destinatario. Si aún no tienes cuenta, <Link href="/invite">créala con tu invitación</Link>. No autoriza inversiones ni transferencias.</p>
       </div>
     </div>
   </section>;

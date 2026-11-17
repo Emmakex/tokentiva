@@ -40,7 +40,15 @@ jobs:
         run: npx --yes auth@1.7.25 migrate --yes
       - name: Migrate domain and invitations
         run: npm run db:domain:migrate
-      - name: Authorization + invitation tests
+      - name: Create restricted application role
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "CREATE ROLE tokentiva_app LOGIN PASSWORD 'ci-test-only-password' NOSUPERUSER NOBYPASSRLS;"
+          psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "GRANT USAGE ON SCHEMA public TO tokentiva_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tokentiva_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tokentiva_app;"
+      - name: Authorization + invitation tests (non-superuser with RLS)
+        env:
+          DATABASE_URL: postgresql://tokentiva_app:ci-test-only-password@localhost:5432/tokentiva_test
         run: npm test
       - name: Typecheck
         run: npm run typecheck
