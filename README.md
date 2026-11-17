@@ -1,36 +1,49 @@
 # Tokentiva
 
-**Infraestructura B2B para preparar y gestionar operaciones de tokenización de activos reales (RWA).**
+**Plataforma B2B para preparar y gestionar operaciones de tokenización de activos reales (RWA).**
 
-Repositorio público de software en desarrollo. **Versión 0.1.0 alfa: demostración sin operaciones financieras reales.**
+Versión **0.2.0-alpha** · Repositorio público con licencia propietaria.
 
-## Probar la demo
+## Desarrollo
 
-Requisitos: Node.js 20.9+ y npm.
+Node.js 22.12+, npm y PostgreSQL 16+.
 
 ```bash
 npm install
+cp .env.example .env.local
+# Rellenar DATABASE_URL, BETTER_AUTH_URL y BETTER_AUTH_SECRET.
+npx auth@1.7.25 migrate --yes
+npm run db:domain:migrate
 npm run dev
 ```
 
-Abrir `http://localhost:3000` y visitar `/demo`. También se puede ejecutar `npm run typecheck` y `npm run build`.
+- `/` — web de presentación.
+- `/demo` — demostración ficticia y local, sin backend.
+- `/login` — inicio de sesión, altas desactivadas por defecto.
+- `/workspace` — área privada de organizaciones y activos en PostgreSQL.
 
-La demo permite crear, filtrar, revisar de forma simulada y eliminar activos. Los datos se guardan exclusivamente en `localStorage` del navegador. No introduzcas datos personales, bancarios ni confidenciales.
+La configuración del primer usuario y las variables necesarias se explican en [F1a](docs/F1A.md). El acceso a la API requiere sesión; cada operación de activos comprueba la pertenencia a la organización en el servidor.
 
-## Producto y roadmap
+## Pruebas
 
-- [Alcance y criterios del MVP](docs/MVP.md)
-- [Arquitectura y seguridad previstas](docs/ARCHITECTURE.md)
+```bash
+npm run typecheck
+npm run build
+# Requiere PostgreSQL de pruebas aislado, con DATABASE_URL terminada en tokentiva_test:
+npm run db:domain:migrate
+npm test
+```
+
+## Documentación
+
+- [MVP y alcance](docs/MVP.md)
+- [Arquitectura de seguridad](docs/ARCHITECTURE.md)
+- [Entrega F1a](docs/F1A.md)
 - [Puertas regulatorias](docs/REGULATORY-GATES.md)
 
-El desarrollo comercial empezará por emisores B2B y gestión SaaS; cualquier tokenización real, oferta de inversión o movimiento de fondos está fuera de alcance hasta contar con evaluación jurídica y los permisos/proveedores necesarios.
+**No hay emisiones de tokens, captación de inversores, custodia, mercados ni pagos financieros.** No introduzcas datos personales sensibles o documentación regulatoria: esta versión es alfa de desarrollo.
 
 ## Propiedad intelectual
 
-**Copyright © 2026 Eduardo Yauri. Todos los derechos reservados.**
-
-Este repositorio es público, pero sus materiales originales están sujetos a licencia propietaria, **no open source**. Consulta [LICENSE](LICENSE) para las condiciones. Las dependencias de terceros conservan sus propias licencias.
-
----
-
-**Tokentiva** · Real World Asset Tokenization Infrastructure
+**Copyright © 2026 Eduardo Yauri — Todos los derechos reservados.**
+El repositorio es público, pero no open source. Consulta [LICENSE](LICENSE). Los componentes de terceros conservan sus respectivas licencias.
