@@ -2,7 +2,7 @@
 
 **Infraestructura B2B para preparar y gestionar operaciones de tokenización de activos reales (RWA).**
 
-Versión **0.5.0-alpha** · Repositorio público · Licencia propietaria.
+Versión **0.6.0-alpha** · Repositorio público · Licencia propietaria.
 
 ## Desarrollo
 
@@ -40,6 +40,13 @@ El propietario genera una invitación para un correo concreto. El invitado crea 
 ## Seguridad y limitaciones
 
 Solo alfa para pruebas. No introducir datos de identificación, bancarios o financieros reales. **No hay tokens reales, inversión, custodia ni pagos**. Se incluyen documentos cifrados en PostgreSQL bajo permisos y RLS; las subidas están **desactivadas por defecto** y necesitan ClamAV y clave antes de habilitarse. Faltan pruebas integradas en staging, respaldos/restauración y validación legal.
+
+## Staging
+
+- [Guía de staging Docker y restauración](docs/F1E-STAGING.md)
+- [Orquestación Docker Compose](deploy/staging.compose.yml)
+
+El entorno de staging todavía requiere un servidor, DNS y secretos válidos. No hay despliegue público realizado.
 
 ## Copyright
 

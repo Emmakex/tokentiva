@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+.next
+out
+coverage
+*.log
+*.dump
+*.age
+.env
+.env.*
+!.env.example
+deploy/.env*
+.DS_Store
+README.md
+docs

@@ -7,3 +7,6 @@ out/
 *.log
 *.tsbuildinfo
 .DS_Store
+
+backups/
+deploy/.env.staging
