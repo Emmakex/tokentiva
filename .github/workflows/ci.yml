@@ -58,17 +58,16 @@ jobs:
         env:
           DATABASE_URL: postgresql://tokentiva_app:ci-test-only-password@localhost:5432/tokentiva_test
         run: npm test
-      - name: PostgreSQL backup and isolated restore drill
-        env:
-          PGPASSWORD: postgres
+      - name: PostgreSQL 16 backup and isolated restore drill
         run: |
-          pg_dump -h localhost -U postgres -d tokentiva_test -Fc -f /tmp/tokentiva-ci.dump
-          createdb -h localhost -U postgres tokentiva_restore_test
-          pg_restore -h localhost -U postgres -d tokentiva_restore_test --no-owner --no-acl /tmp/tokentiva-ci.dump
-          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='assets';" | grep -qx t
-          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='asset_documents';" | grep -qx t
-          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT count(*) FROM organization_invitations WHERE role='owner';" | grep -qx 1
-          rm -f /tmp/tokentiva-ci.dump
+          docker run --rm --network host -e PGPASSWORD=postgres postgres:16-alpine sh -ec '
+            pg_dump -h 127.0.0.1 -U postgres -d tokentiva_test -Fc -f /tmp/tokentiva-ci.dump
+            createdb -h 127.0.0.1 -U postgres tokentiva_restore_test
+            pg_restore -h 127.0.0.1 -U postgres -d tokentiva_restore_test --no-owner --no-acl /tmp/tokentiva-ci.dump
+            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''assets'\'';" | grep -qx t
+            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='\''asset_documents'\'';" | grep -qx t
+            psql -h 127.0.0.1 -U postgres -d tokentiva_restore_test -Atqc "SELECT count(*) FROM organization_invitations WHERE role='\''owner'\'';" | grep -qx 1
+          '
       - name: Verify Docker Compose configuration
         run: docker compose --env-file deploy/.env.staging.example -f deploy/staging.compose.yml config --quiet
       - name: Typecheck
