@@ -7,9 +7,11 @@ if (!process.env.DATABASE_URL) {
 }
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 try {
-  const sql = await readFile(new URL("../db/migrations/001_domain.sql", import.meta.url), "utf8");
-  await pool.query(sql);
-  console.log("TOKENTIVA_DOMAIN_MIGRATION_OK");
+  for (const filename of ["001_domain.sql", "002_invites.sql"]) {
+    const sql = await readFile(new URL("../db/migrations/" + filename, import.meta.url), "utf8");
+    await pool.query(sql);
+  }
+  console.log("TOKENTIVA_DOMAIN_MIGRATIONS_OK");
 } finally {
   await pool.end();
 }

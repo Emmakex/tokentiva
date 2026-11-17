@@ -28,6 +28,14 @@ export default function LoginClient() {
         setError("No se ha podido completar el acceso. Comprueba las credenciales o contacta con el administrador.");
         return;
       }
+      if (!register && result.data && "twoFactorRedirect" in result.data && result.data.twoFactorRedirect) {
+        router.replace("/two-factor");
+        return;
+      }
+      if (register) {
+        setError("Cuenta creada. Comprueba el correo de verificación antes de entrar.");
+        return;
+      }
       router.replace("/workspace");
       router.refresh();
     } catch {
@@ -52,7 +60,7 @@ export default function LoginClient() {
       <button type="submit" className="button" disabled={loading}>{loading ? "Verificando…" : (register ? "Crear usuario" : "Entrar al panel")}</button>
     </form>
     {canSignUp && <button className="auth-switch" type="button" onClick={() => { setRegister(!register); setError(""); }}>{register ? "Ya tengo cuenta → Entrar" : "Activación inicial → Crear cuenta"}</button>}
-    <p className="auth-foot">Acceso restringido. El registro público está {canSignUp ? "habilitado temporalmente para pruebas" : "desactivado"}.</p>
+    <p className="auth-foot">Se requiere correo verificado y autenticación de dos factores. El registro público está {canSignUp ? "habilitado temporalmente para pruebas" : "desactivado"}.</p>
     <Link href="/" className="auth-back">← Volver al inicio</Link>
   </div>;
 }

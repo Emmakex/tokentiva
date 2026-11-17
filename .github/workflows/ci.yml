@@ -36,11 +36,11 @@ jobs:
           node-version: "22"
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Migrate Better Auth schema
+      - name: Migrate Better Auth schema (including TOTP)
         run: npx --yes auth@1.7.25 migrate --yes
-      - name: Migrate domain tables in test database
+      - name: Migrate domain and invitations
         run: npm run db:domain:migrate
-      - name: Tenant authorization tests
+      - name: Authorization + invitation tests
         run: npm test
       - name: Typecheck
         run: npm run typecheck
