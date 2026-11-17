@@ -2,7 +2,7 @@
 
 **Infraestructura B2B para preparar y gestionar operaciones de tokenización de activos reales (RWA).**
 
-Versión **0.4.0-alpha** · Repositorio público · Licencia propietaria.
+Versión **0.5.0-alpha** · Repositorio público · Licencia propietaria.
 
 ## Desarrollo
 
@@ -34,11 +34,12 @@ El propietario genera una invitación para un correo concreto. El invitado crea 
 - [F1a: multiempresa y base de datos](docs/F1A.md)
 - [F1b: MFA, correo e invitaciones](docs/F1B.md)
 - [F1c: alta por invitación y RLS en activos](docs/F1C.md)
+- [F1d: documentos cifrados y guía de staging](docs/F1D.md)
 - [Puertas legales](docs/REGULATORY-GATES.md)
 
 ## Seguridad y limitaciones
 
-Solo alfa para pruebas. No introducir datos de identificación, bancarios o financieros reales. **No hay tokens reales, inversión, custodia ni pagos**. Faltan onboarding productivo, RLS, documentos cifrados, tests E2E y validación en staging.
+Solo alfa para pruebas. No introducir datos de identificación, bancarios o financieros reales. **No hay tokens reales, inversión, custodia ni pagos**. Se incluyen documentos cifrados en PostgreSQL bajo permisos y RLS; las subidas están **desactivadas por defecto** y necesitan ClamAV y clave antes de habilitarse. Faltan pruebas integradas en staging, respaldos/restauración y validación legal.
 
 ## Copyright
 

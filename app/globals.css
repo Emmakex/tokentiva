@@ -176,3 +176,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .invite-list button{margin-left:8px;background:transparent;border:1px solid #715351;color:#ffbbb9;padding:5px 9px;border-radius:6px;font-size:11px}
 .invite-help{font-size:12px;color:var(--muted);line-height:1.65}
 @media(max-width:770px){.invite-grid{grid-template-columns:1fr}}
+
+/* F1d: private documents */
+.docs-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:28px}
+.docs-grid label,.docs-form label{display:block;color:#d5e4e8;font-size:12px;font-weight:700;margin:8px 0}
+.docs-grid select,.docs-form input{width:100%;min-width:0;background:#0a1a2a;border:1px solid #395368;border-radius:8px;color:#eef5f8;padding:12px}
+.docs-form{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.docs-list{padding:0;margin:18px 0;list-style:none}
+.docs-list li{border-top:1px solid #334a5a;padding:12px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.docs-list strong{display:block;font-size:13px;overflow-wrap:anywhere}
+.docs-list small{display:block;color:var(--muted);font-size:11px;margin-top:6px}
+.docs-list button{background:#164044;border:1px solid #3d7673;border-radius:7px;padding:7px 10px;color:var(--cyan);font-size:11px;margin:0 4px 6px 0}
+.docs-grid h3{font-size:15px;margin:10px 0 14px}
+@media(max-width:800px){.docs-grid{grid-template-columns:1fr}}
