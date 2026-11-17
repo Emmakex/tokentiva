@@ -46,11 +46,35 @@ jobs:
         run: |
           psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "CREATE ROLE tokentiva_app LOGIN PASSWORD 'ci-test-only-password' NOSUPERUSER NOBYPASSRLS;"
           psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "GRANT USAGE ON SCHEMA public TO tokentiva_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tokentiva_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tokentiva_app;"
+      - name: Bootstrap owner invite rehearsal (admin only, hide one-time token)
+        env:
+          TOKENTIVA_BOOTSTRAP_EMAIL: bootstrap-ci@example.org
+          TOKENTIVA_BOOTSTRAP_ORG: Tokentiva Staging CI
+        run: |
+          node scripts/bootstrap-owner.mjs > /tmp/tokentiva-bootstrap.txt
+          grep -q TOKENTIVA_BOOTSTRAP_CREATED /tmp/tokentiva-bootstrap.txt
+          ! node scripts/bootstrap-owner.mjs > /dev/null 2>&1
+          rm -f /tmp/tokentiva-bootstrap.txt
       - name: Authorization + invitation tests (non-superuser with RLS)
         env:
           DATABASE_URL: postgresql://tokentiva_app:ci-test-only-password@localhost:5432/tokentiva_test
         run: npm test
+      - name: PostgreSQL backup and isolated restore drill
+        env:
+          PGPASSWORD: postgres
+        run: |
+          pg_dump -h localhost -U postgres -d tokentiva_test -Fc -f /tmp/tokentiva-ci.dump
+          createdb -h localhost -U postgres tokentiva_restore_test
+          pg_restore -h localhost -U postgres -d tokentiva_restore_test --no-owner --no-acl /tmp/tokentiva-ci.dump
+          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='assets';" | grep -qx t
+          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT (relrowsecurity AND relforcerowsecurity)::text FROM pg_class WHERE relname='asset_documents';" | grep -qx t
+          psql -h localhost -U postgres -d tokentiva_restore_test -Atqc "SELECT count(*) FROM organization_invitations WHERE role='owner';" | grep -qx 1
+          rm -f /tmp/tokentiva-ci.dump
+      - name: Verify Docker Compose configuration
+        run: docker compose --env-file deploy/.env.staging.example -f deploy/staging.compose.yml config --quiet
       - name: Typecheck
         run: npm run typecheck
       - name: Build
         run: npm run build
+      - name: Build staging application container
+        run: docker build --target runner --tag tokentiva:ci .
