@@ -14,7 +14,7 @@ export default function Home() {
         <nav aria-label="Navegación principal">
           <a href="#plataforma">Plataforma</a>
           <a href="#enfoque">Enfoque</a>
-          <Link className="button button-small" href="/demo">Explorar demo <span aria-hidden="true">↗</span></Link>
+          <Link className="button button-small" href="/login">Acceso empresas <span aria-hidden="true">↗</span></Link>
         </nav>
       </header>
 

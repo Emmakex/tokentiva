@@ -8,7 +8,27 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: tokentiva_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d tokentiva_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tokentiva_test
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: test-only-very-long-better-auth-secret-not-for-production
+      TOKENTIVA_SIGNUP_ENABLED: "false"
+      NEXT_PUBLIC_TOKENTIVA_SIGNUP_ENABLED: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,6 +36,10 @@ jobs:
           node-version: "22"
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Migrate domain tables in test database
+        run: npm run db:domain:migrate
+      - name: Database tenancy tests
+        run: npm test
       - name: Typecheck
         run: npm run typecheck
       - name: Build
