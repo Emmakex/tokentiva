@@ -7,7 +7,7 @@ if (!process.env.DATABASE_URL) {
 }
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 try {
-  for (const filename of ["001_domain.sql", "002_invites.sql"]) {
+  for (const filename of ["001_domain.sql", "002_invites.sql", "003_asset_rls.sql"]) {
     const sql = await readFile(new URL("../db/migrations/" + filename, import.meta.url), "utf8");
     await pool.query(sql);
   }

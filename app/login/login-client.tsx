@@ -60,7 +60,8 @@ export default function LoginClient() {
       <button type="submit" className="button" disabled={loading}>{loading ? "Verificando…" : (register ? "Crear usuario" : "Entrar al panel")}</button>
     </form>
     {canSignUp && <button className="auth-switch" type="button" onClick={() => { setRegister(!register); setError(""); }}>{register ? "Ya tengo cuenta → Entrar" : "Activación inicial → Crear cuenta"}</button>}
-    <p className="auth-foot">Se requiere correo verificado y autenticación de dos factores. El registro público está {canSignUp ? "habilitado temporalmente para pruebas" : "desactivado"}.</p>
+    <p className="auth-foot">Se requiere correo verificado y autenticación de dos factores. El acceso por invitación está disponible y el registro abierto permanece desactivado.</p>
+    <p className="auth-foot"><Link href="/invite">¿Te han invitado? Crea tu cuenta desde la invitación</Link></p>
     <Link href="/" className="auth-back">← Volver al inicio</Link>
   </div>;
 }

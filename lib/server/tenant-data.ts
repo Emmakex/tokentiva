@@ -1,4 +1,5 @@
 import { pool } from "@/lib/server/db";
+import { setTenantContext } from "@/lib/server/tenant-context";
 
 export type AssetKind = "real_estate" | "business_financing" | "energy" | "other";
 export type AssetStatus = "draft" | "internal_review";
@@ -37,6 +38,7 @@ export async function createOrganizationForUser(userId: string, name: string) {
       "INSERT INTO memberships (organization_id, user_id, role) VALUES ($1, $2, 'owner')",
       [org.id, userId]
     );
+    await setTenantContext(client, org.id);
     await client.query(
       "INSERT INTO audit_events (organization_id, actor_user_id, action, subject_id) VALUES ($1, $2, 'organization.created', $3)",
       [org.id, userId, org.id]
@@ -52,19 +54,31 @@ export async function createOrganizationForUser(userId: string, name: string) {
 }
 
 export async function listAssetsForUser(userId: string, orgId: string): Promise<StoredAsset[] | null> {
-  const membership = await pool.query(
-    "SELECT 1 FROM memberships WHERE organization_id=$1 AND user_id=$2",
-    [orgId, userId]
-  );
-  if (!membership.rowCount) return null;
-  const { rows } = await pool.query<StoredAsset>(
-    `SELECT a.id, a.organization_id, a.name, a.kind, a.value_cents, a.status, a.created_at
-     FROM assets a WHERE a.organization_id = $1
-     AND EXISTS (SELECT 1 FROM memberships m WHERE m.organization_id=a.organization_id AND m.user_id=$2)
-     ORDER BY a.created_at DESC LIMIT 100`,
-    [orgId, userId]
-  );
-  return rows;
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await setTenantContext(client, orgId);
+    const membership = await client.query(
+      "SELECT 1 FROM memberships WHERE organization_id=$1 AND user_id=$2", [orgId, userId]
+    );
+    if (!membership.rowCount) {
+      await client.query("ROLLBACK");
+      return null;
+    }
+    const { rows } = await client.query<StoredAsset>(
+      `SELECT a.id, a.organization_id, a.name, a.kind, a.value_cents, a.status, a.created_at
+       FROM assets a WHERE a.organization_id = $1
+         AND EXISTS (SELECT 1 FROM memberships m
+           WHERE m.organization_id=a.organization_id AND m.user_id=$2)
+       ORDER BY a.created_at DESC LIMIT 100`,
+      [orgId, userId]
+    );
+    await client.query("COMMIT");
+    return rows;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally { client.release(); }
 }
 
 export async function createAssetForUser(
@@ -73,6 +87,7 @@ export async function createAssetForUser(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    await setTenantContext(client, orgId);
     const { rows } = await client.query<StoredAsset>(
       `INSERT INTO assets (organization_id, name, kind, value_cents, created_by)
        SELECT $1, $2, $3, $4, $5
@@ -100,6 +115,7 @@ export async function updateAssetStatusForUser(userId: string, orgId: string, as
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    await setTenantContext(client, orgId);
     const { rows } = await client.query<StoredAsset>(
       `UPDATE assets SET status=$4, updated_at=now()
        WHERE organization_id=$1 AND id=$2
@@ -127,6 +143,7 @@ export async function deleteAssetForUser(userId: string, orgId: string, assetId:
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    await setTenantContext(client, orgId);
     const deleted = await client.query(
       `DELETE FROM assets WHERE organization_id=$1 AND id=$2
        AND EXISTS (

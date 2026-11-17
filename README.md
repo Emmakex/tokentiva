@@ -2,7 +2,7 @@
 
 **Infraestructura B2B para preparar y gestionar operaciones de tokenización de activos reales (RWA).**
 
-Versión **0.3.0-alpha** · Repositorio público · Licencia propietaria.
+Versión **0.4.0-alpha** · Repositorio público · Licencia propietaria.
 
 ## Desarrollo
 
@@ -19,12 +19,13 @@ npm run dev
 
 - `/`: presentación comercial.
 - `/demo`: demostración ficticia sin backend.
-- `/login`: acceso privado; registro cerrado por defecto.
+- `/login`: acceso privado; registro abierto desactivado por defecto.
+- `/invite`: registro únicamente con una invitación válida.
 - `/security`: configuración de autenticación TOTP.
 - `/two-factor`: desafío TOTP / código de recuperación.
 - `/workspace`: empresas y activos persistentes (requiere correo verificado y TOTP).
 
-El código de las invitaciones se genera para usuarios ya registrados y verificados. No hay todavía envío automático de invitación ni alta autónoma de nuevos colaboradores.
+El propietario genera una invitación para un correo concreto. El invitado crea su cuenta en `/invite`, verifica el correo, configura TOTP y acepta su invitación desde el panel. No hay envío automático del código: se comparte por un canal privado.
 
 ## Documentación
 
@@ -32,6 +33,7 @@ El código de las invitaciones se genera para usuarios ya registrados y verifica
 - [Arquitectura](docs/ARCHITECTURE.md)
 - [F1a: multiempresa y base de datos](docs/F1A.md)
 - [F1b: MFA, correo e invitaciones](docs/F1B.md)
+- [F1c: alta por invitación y RLS en activos](docs/F1C.md)
 - [Puertas legales](docs/REGULATORY-GATES.md)
 
 ## Seguridad y limitaciones
