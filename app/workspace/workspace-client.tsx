@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import InvitationsClient from "./invitations-client";
+import DocumentsClient from "./documents-client";
 
 type Role = "owner" | "editor" | "viewer";
 type Org = { id: string; name: string; role: Role };
@@ -182,6 +183,7 @@ export default function WorkspaceClient({ userName }: { userName: string }) {
         </>}
       </div>
     </section>
+    <DocumentsClient organizationId={selectedId} assets={assets.map(a => ({id:a.id,name:a.name}))} role={selected?.role} />
     <InvitationsClient organizationId={selectedId} isOwner={selected?.role === "owner"} onAccepted={loadOrganizations} />
     <section className="compliance-card"><div className="compliance-symbol">!</div><div><h2>Operaciones financieras desactivadas</h2><p>Este panel registra datos operativos, no representa derechos reales ni realiza tokenizaciones. Antes de activar emisiones, pagos o inversores deberá superarse la evaluación legal y de seguridad.</p></div><span className="compliance-flag">BLOQUEADO</span></section>
   </div>;
