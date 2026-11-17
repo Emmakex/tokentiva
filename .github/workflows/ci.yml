@@ -44,8 +44,7 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "CREATE ROLE tokentiva_app LOGIN PASSWORD 'ci-test-only-password' NOSUPERUSER NOBYPASSRLS;"
-          psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -c "GRANT USAGE ON SCHEMA public TO tokentiva_app; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tokentiva_app; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO tokentiva_app;"
+          psql -h localhost -U postgres -d tokentiva_test -v ON_ERROR_STOP=1 -v app_password=ci-test-only-password -f scripts/provision-runtime-role.sql
       - name: Bootstrap owner invite rehearsal (admin only, hide one-time token)
         env:
           TOKENTIVA_BOOTSTRAP_EMAIL: bootstrap-ci@example.org
